@@ -17,6 +17,14 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Other Build Files
+*.tlog
+*.obj
+*.log
+*.lastbuildstate
+*.idp
+*.pdb
+
 # =========================
 # Operating System Files
 # =========================
