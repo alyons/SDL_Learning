@@ -22,7 +22,7 @@ $RECYCLE.BIN/
 *.obj
 *.log
 *.lastbuildstate
-*.idp
+*.idb
 *.pdb
 
 # =========================
