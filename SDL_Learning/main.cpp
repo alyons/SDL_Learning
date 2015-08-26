@@ -15,8 +15,8 @@ enum KeyPressSurfaces {
 };
 
 //Constants
-const int SCREEN_WIDTH = 240;
-const int SCREEN_HEIGHT = 160;
+const int SCREEN_WIDTH = 480;
+const int SCREEN_HEIGHT = 320;
 const int SCREEN_FPS = 60;
 const int STANDING_FRAME_COUNT = 8;
 const int RUNNING_FRAME_COUNT = 1;
@@ -36,6 +36,7 @@ SDL_Rect gSpriteRects[STANDING_FRAME_COUNT];
 SDL_Rect floorRect;
 int floorOffset = 0;
 int backgroundHorzOffset = 0;
+int backgroundVertOffset = 0;
 int moveSpeed = 0;
 int vertSpeed = 0;
 
@@ -97,7 +98,7 @@ bool loadMedia() {
 		success = false;
 	}
 
-	if (!stageObjects.loadFromFile("resources/images/stageObjects.gif", gRenderer)) {
+	if (!stageObjects.loadFromFile("resources/images/stageObjects.png", gRenderer)) {
 		printf("Failed to load stage objects texture.\n");
 		success = false;
 	}
@@ -211,28 +212,33 @@ int main(int argc, char* args[]) {
 			bool quit = false;
 			SDL_Event e;
 			int frame = 0;
+			backgroundVertOffset = ((SCREEN_HEIGHT - background.getHeight()) / 2);
 
 			while (!quit) {
 				while (SDL_PollEvent(&e) != 0) {
 					if (e.type == SDL_QUIT) {
 						quit = true;
 					} else if (e.type == SDL_KEYDOWN) {
-						switch (e.key.keysym.sym) {
-							case SDLK_LEFT:
-								moveSpeed = -7;
-								break;
-							case SDLK_RIGHT:
-								moveSpeed = 7;
-								break;
-							case SDLK_UP:
-								vertSpeed = -1;
-								break;
-							case SDLK_DOWN:
-								vertSpeed = 1;
-								break;
+						
+						if ((e.key.keysym.sym & SDLK_LEFT) == SDLK_LEFT) {
+							moveSpeed = -7;
+						} else if ((e.key.keysym.sym & SDLK_RIGHT) == SDLK_RIGHT) {
+							moveSpeed = 7;
+						} else {
+							moveSpeed = 0;
 						}
+						
+						if ((e.key.keysym.sym & SDLK_UP) == SDLK_UP) {
+							vertSpeed = -1;
+						} else if ((e.key.keysym.sym & SDLK_DOWN) == SDLK_DOWN) {
+							vertSpeed = 1;
+						} else {
+							vertSpeed = 0;
+						}
+
 					} else {
 						moveSpeed = 0;
+						vertSpeed = 0;
 					}
 				}
 
@@ -250,13 +256,16 @@ int main(int argc, char* args[]) {
 				SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 				SDL_RenderClear(gRenderer);
 
-				background.render(gRenderer, backgroundHorzOffset, ((SCREEN_HEIGHT - background.getHeight()) / 2) + 40);
-				background.render(gRenderer, backgroundHorzOffset + background.getWidth(), ((SCREEN_HEIGHT - background.getHeight()) / 2) + 40);
+				backgroundVertOffset -= vertSpeed;
 
-				//texture.render(gRenderer, ((SCREEN_WIDTH - rect->w) / 2), 20, rect);
+				if (backgroundVertOffset < -(background.getHeight() - SCREEN_HEIGHT)) backgroundVertOffset = -(background.getHeight() - SCREEN_HEIGHT);
+				if (backgroundVertOffset > 0) backgroundVertOffset = 0;
+
+				background.render(gRenderer, backgroundHorzOffset, backgroundVertOffset);
+				background.render(gRenderer, backgroundHorzOffset + background.getWidth(), backgroundVertOffset);
 
 				for (int floorRepeat = floorOffset - floorRect.w; floorRepeat <= SCREEN_WIDTH; floorRepeat += floorRect.w) {
-					stageObjects.render(gRenderer, floorRepeat, SCREEN_HEIGHT - floorRect.h, &floorRect);
+					stageObjects.render(gRenderer, floorRepeat, SCREEN_HEIGHT - floorRect.h - 40, &floorRect);
 				}
 
 				SDL_RenderPresent(gRenderer);

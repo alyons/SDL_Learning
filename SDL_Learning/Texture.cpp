@@ -22,7 +22,15 @@ bool Texture::loadFromFile(std::string path, SDL_Renderer* renderer) {
 	if (loadedSurface == NULL) {
 		printf("Failed to load texture: %s\nError: %s\n", path.c_str(), IMG_GetError());
 	} else {
-		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
+		/*unsigned int color = ((unsigned int*)loadedSurface->pixels)[0*(loadedSurface->pitch/sizeof(unsigned int))+0];
+		int red = (color & 0xFF000000) >> 24;
+		int green = (color & 0x00FF0000) >> 16;
+		int blue = (color & 0x0000FF00) >> 8;
+		int alpha = (color & 0x000000FF);
+
+		printf("Color: %X\nR: %d\nG: %d\nB: %d\n", color, red, green, blue);
+
+		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, red, green, blue));*/
 		newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 		if( newTexture == NULL )
 		{
